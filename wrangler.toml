@@ -1,0 +1,6 @@
+name = "wasm-worker"
+main = "worker/index.js"
+compatibility_date = "2025-06-14"
+
+[wasm_modules]
+hello_wasm = "worker/dist/hello_wasm_bg.wasm"

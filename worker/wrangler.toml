@@ -1,8 +1,0 @@
-name = "wasm-worker"
-type = "javascript"  # JSで書いてる場合（`index.js`）
-
-main = "worker/index.js"    # Workerスクリプトのエントリーポイント
-compatibility_date = "2025-06-14"
-
-[build]
-upload.format = "modules"
