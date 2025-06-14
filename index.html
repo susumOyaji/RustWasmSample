@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust WebAssembly Hello World</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦀 Rust + WebAssembly Demo</h1>
+            <p>A simple Hello World application using Rust compiled to WebAssembly</p>
+        </header>
+
+        <main>
+            <section class="demo-section">
+                <h2>Basic Hello World</h2>
+                <button id="hello-btn" class="demo-btn">Say Hello World</button>
+                <div id="hello-output" class="output"></div>
+            </section>
+
+            <section class="demo-section">
+                <h2>Personalized Greeting</h2>
+                <div class="input-group">
+                    <input type="text" id="name-input" placeholder="Enter your name" value="WebAssembly">
+                    <button id="greet-btn" class="demo-btn">Greet Me</button>
+                </div>
+                <div id="greet-output" class="output"></div>
+            </section>
+
+            <section class="demo-section">
+                <h2>Simple Calculator</h2>
+                <div class="input-group">
+                    <input type="number" id="num1" placeholder="First number" value="10">
+                    <span class="operator">+</span>
+                    <input type="number" id="num2" placeholder="Second number" value="20">
+                    <button id="add-btn" class="demo-btn">Calculate</button>
+                </div>
+                <div id="calc-output" class="output"></div>
+            </section>
+
+            <section class="demo-section">
+                <h2>Timestamp</h2>
+                <button id="timestamp-btn" class="demo-btn">Get Current Timestamp</button>
+                <div id="timestamp-output" class="output"></div>
+            </section>
+
+            <section class="demo-section">
+                <h2>Yahoo Homepage Proxy</h2>
+                <div class="input-group">
+                    <button id="load-yahoo-btn" class="demo-btn">Load Yahoo Homepage</button>
+                    <button id="load-news-btn" class="demo-btn">Load Yahoo News</button>
+                    <button id="open-yahoo-tab-btn" class="demo-btn">Open Yahoo in New Tab</button>
+                    <button id="open-yahoo-news-tab-btn" class="demo-btn">Open Yahoo News in New Tab</button>
+                </div>
+                <div id="yahoo-output" class="output"></div>
+                <div id="yahoo-content" class="yahoo-container"></div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="info">
+                <h3>How it works:</h3>
+                <ul>
+                    <li>Rust code is compiled to WebAssembly using <code>wasm-pack</code></li>
+                    <li>JavaScript loads the WASM module and calls Rust functions</li>
+                    <li>Results are displayed on the webpage and logged to console</li>
+                    <li>Check the browser console to see additional debug messages</li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <div id="loading" class="loading">
+        <p>Loading WebAssembly module...</p>
+    </div>
+
+    <div id="error" class="error hidden">
+        <h3>Error Loading WebAssembly</h3>
+        <p>This demo requires WebAssembly support and the compiled WASM module.</p>
+        <p>To build the WASM module, run:</p>
+        <pre><code>wasm-pack build --target web --out-dir pkg</code></pre>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
