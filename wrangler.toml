@@ -1,0 +1,11 @@
+name = "rustwasm-functions" # 任意の名前
+#main = "src/lib.rs"
+#main = "build/worker/shim.mjs" # worker-buildの出力パスに合わせて調整
+compatibility_date = "2025-06-22" # 今日の日付かそれ以降
+pages_build_output_dir = "./public" # ビルド出力ディレクトリ、静的アセットのルートディレクトリ
+# Rustプロジェクトのためのビルド設定
+[build]
+#command = "cargo install -q worker-build && worker-build --release" # `wrangler dev` の場合は --release は不要かも
+# output_dir も指定しておくと、Wrangler がビルド成果物をどこに探せばよいか明確になります。
+# `functions/` ディレクトリから見た相対パスです。
+#output_dir = "build" 

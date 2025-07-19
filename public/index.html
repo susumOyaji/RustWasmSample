@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>株式ポートフォリオ管理</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="section-card">
+
+            <div class="input-section">
+                <button id="openPortfolioModalBtn">ポートフォリオを見る / 編集</button>
+                <input type="text" id="stockCodesInput" placeholder="例: 6758, 5016" value="">
+                <button id="fetchDataButton">株価を取得</button>
+
+
+
+                <div class="auto-update-group">
+                    <button id="toggle-auto-update-btn" class="demo-btn">Start Auto Update</button>
+                    <label for="update-interval">Update Interval:</label>
+                    <select id="update-interval" class="interval-select">
+                        <option value="5">5 seconds</option>
+                        <option value="10">10 seconds</option>
+                        <option value="30" selected>30 seconds</option>
+                        <option value="60">1 minute</option>
+                        <option value="300">5 minutes</option>
+                    </select>
+                    <span id="countdown-display" class="countdown-display"></span>
+                </div>
+            </div>
+
+            <div id="searchResultsSection" style="margin-top: 30px;">
+
+
+                <div id="index-forex-container" class="index-forex-grid"></div>
+                <div id="totalSearchResultsProfitLossContainer">
+                    <p id="totalPurchaseCost">合計購入費用: 計算中...</p>
+                    <p id="totalSearchResultsProfitLoss">検索結果の合計評価損益: 計算中...</p>
+                </div>
+                <div id="stock-container" class="results-grid"></div>
+            </div>
+            <div id="resultsLoading" style="display:none;">データを取得中...</div>
+            <div id="search-results-container">
+
+            </div>
+            <pre id="searchRawData">ここにAPIからの生データが表示されます。</pre>
+        </div>
+
+        <div id="portfolioModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <div class="modal-header">
+                    <h3>ポートフォリオ管理</h3>
+                </div>
+
+                <div class="modal-body">
+                    <div class="input-section">
+                        <label for="modalStockCodesInput" class="sr-only">銘柄コード</label>
+                        <input type="text" id="modalStockCodesInput" placeholder="例: 6758.T, 4755.T, 5016.T" value="">
+                        <button id="modalFetchDataButton">データを取得</button>
+                    </div>
+                    <div id="modalSearchResultsSection" style="margin-top: 30px;">
+                       
+                        <div id="modal-results-container">
+                            <div id="modal-index-forex-container" class="index-forex-grid"></div>
+                            <div id="modal-stock-container" class="results-grid"></div>
+                        </div>
+                        <div id="modal-resultsLoading" style="display:none;">データを取得中...</div>
+                        <div id="modal-search-results-container">
+
+                        </div>
+                        <div id="modal-totalSearchResultsProfitLossContainer">
+                            <p id="modal-totalSearchResultsProfitLoss">検索結果の合計評価損益: 計算中...</p>
+                        </div>
+                        
+                    </div>
+                    <h4>保有銘柄一覧</h4>
+                    <table id="portfolioTable">
+                        <thead>
+                            <tr>
+                                <th>企業コード</th>
+                                <th>取得株数</th>
+                                <th>購入単価</th>
+                                <th>現在株価</th>
+                                <th>評価額</th>
+                                <th>評価損益</th>
+                                <th>損益率</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div class="portfolio-totals">
+                        <p id="portfolioTotalValue">合計評価額: 計算中...</p>
+                        <p id="portfolioTotalProfit">合計評価損益: 計算中...</p>
+                    </div>
+
+                    <h4 class="portfolio-form-title">銘柄の追加 / 編集</h4>
+                    <div class="portfolio-form">
+                        <label for="portfolioCode" class="sr-only">企業コード</label>
+                        <input type="text" id="portfolioCode" placeholder="企業コード (例: 6758.T)">
+                        <label for="portfolioShares" class="sr-only">取得株数</label>
+                        <input type="number" id="portfolioShares" placeholder="取得株数" value="100">
+                        <label for="portfolioPrice" class="sr-only">購入単価</label>
+                        <input type="number" id="portfolioPrice" placeholder="購入単価" value="1000">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="modal-buttons">
+                        <button id="addOrUpdatePortfolioBtn">銘柄を追加 / 更新</button>
+                        <button id="cancelPortfolioModalBtn" type="button" class="secondary-button">キャンセル</button>
+                        <button id="clearPortfolioFormBtn" type="button" class="secondary-button">入力クリア</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="main.js"></script>
+</body>
+
+</html>

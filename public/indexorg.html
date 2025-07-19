@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Rust WebAssembly Hello World</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🦀 Rust + WebAssembly Demo</h1>
+            <p>A simple Hello World application using Rust compiled to WebAssembly</p>
+        </header>
+
+        <main>
+
+
+            <section class="demo-section">
+                <h2>株式ポートフォリオ (Yahoo Finance)</h2>
+                <h3>保有銘柄一覧</h3>
+                <table id="portfolioTable">
+                    <thead>
+                        <tr>
+                            <th>企業コード</th>
+                            <th>取得株数</th>
+                            <th>購入単価</th>
+                            <th>現在株価</th>
+                            <th>評価額</th>
+                            <th>評価損益</th>
+                            <th>損益率</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portfolioTableBody"> </tbody>
+                    <span id="portfolioTotalValue"></span>
+                    <span id="portfolioTotalProfit"></span>
+                    <div class="input-group">
+                        <button id="toggle-auto-update-btn" class="demo-btn">Start Auto Update</button>
+                        <label for="update-interval">Update Interval:</label>
+                        <select id="update-interval" class="interval-select">
+                            <option value="5">5 seconds</option>
+                            <option value="10">10 seconds</option>
+                            <option value="30" selected>30 seconds</option>
+                            <option value="60">1 minute</option>
+                            <option value="300">5 minutes</option>
+                        </select>
+                        <span id="countdown-display" class="countdown-display"></span>
+                    </div>
+
+                    <div class="index-portfolios">
+                        <div id="dow-portfolio" class="portfolio-summary"></div>
+                        <div id="nikkei-portfolio" class="portfolio-summary"></div>
+                        <div id="usdjpy-portfolio" class="portfolio-summary"></div>
+                    </div>
+                    <div id="portfolio-summary" class="portfolio-summary"></div>
+                    <div class="stocks-grid">
+                        <div class="stock-column">
+                            <div id="sony-stock-output" class="output"></div>
+                            <div id="sony-stock-content" class="stock-container"></div>
+                        </div>
+                        <div class="stock-column">
+                            <div id="rakuten-stock-output" class="output"></div>
+                            <div id="rakuten-stock-content" class="stock-container"></div>
+                        </div>
+                        <div class="stock-column">
+                            <div id="jx-stock-output" class="output"></div>
+                            <div id="jx-stock-content" class="stock-container"></div>
+                        </div>
+                        <div class="stock-column">
+                            <div id="toyota-stock-output" class="output"></div>
+                            <div id="toyota-stock-content" class="stock-container"></div>
+                        </div>
+                        <div class="stock-column">
+                            <div id="softbank-stock-output" class="output"></div>
+                            <div id="softbank-stock-content" class="stock-container"></div>
+                        </div>
+                        <div class="stock-column">
+                            <div id="nintendo-stock-output" class="output"></div>
+                            <div id="nintendo-stock-content" class="stock-container"></div>
+                        </div>
+                    </div>
+            </section>
+
+        </main>
+
+        <footer>
+            <div class="info">
+                <h3>How it works:</h3>
+                <ul>
+                    <li>Rust code is compiled to WebAssembly using <code>wasm-pack</code></li>
+                    <li>JavaScript loads the WASM module and calls Rust functions</li>
+                    <li>Results are displayed on the webpage and logged to console</li>
+                    <li>Check the browser console to see additional debug messages</li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <div id="loading" class="loading">
+        <p>Loading WebAssembly module...</p>
+    </div>
+
+    <div id="error" class="error hidden">
+        <h3>Error Loading WebAssembly</h3>
+        <p>This demo requires WebAssembly support and the compiled WASM module.</p>
+        <p>To build the WASM module, run:</p>
+        <pre><code>wasm-pack build --target web --out-dir pkg</code></pre>
+    </div>
+
+    <script type="module" src="main2.js"></script>
+</body>
+
+</html>
