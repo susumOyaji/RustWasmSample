@@ -744,3 +744,13 @@ h3 {
         flex-shrink: 0;
     }
 }
+
+/* メインページのカードコンテナのスタイル */
+#stock-container,
+#portfolio-container {
+    border: 1px solid var(--border); /* 枠線を追加 */
+    border-radius: 12px;             /* 角を丸くする */
+    padding: 20px;                   /* 内側の余白 */
+    background-color: hsla(var(--primary-hue), 20%, 98%, 0.5); /* 少し背景色をつける */
+    min-height: 100px; /* データがない場合でも最小の高さを確保 */
+}

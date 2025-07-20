@@ -268,25 +268,24 @@ function attachPortfolioEventListeners() {
 function toggleAutoUpdate() {
     isAutoUpdateActive = !isAutoUpdateActive;
     const toggleBtn = document.getElementById('toggle-auto-update-btn');
-    // stockCodesInput の代わりに myPortfolio からコードを取得
     const codes = myPortfolio.map(item => item.code).join(',');
 
     if (isAutoUpdateActive) {
         toggleBtn.textContent = 'Stop Auto Update';
         toggleBtn.classList.add('active');
-        if (codes) { // myPortfolio が空でなければ
+        if (codes) {
             const intervalSeconds = parseInt(document.getElementById('update-interval').value, 10);
             timeRemaining = intervalSeconds;
-            fetchMainData(codes);
+            fetchMainData(codes, 'portfolio-container'); // ポートフォリオコンテナを更新
             autoUpdateIntervalId = setInterval(() => {
                 timeRemaining = intervalSeconds;
-                fetchMainData(codes);
+                fetchMainData(codes, 'portfolio-container'); // ポートフォリオコンテナを更新
             }, intervalSeconds * 1000);
             if (countdownIntervalId) clearInterval(countdownIntervalId);
             countdownIntervalId = setInterval(updateCountdownDisplay, 1000);
         } else {
             alert('ポートフォリオに銘柄が登録されていません。自動更新を開始できません。');
-            isAutoUpdateActive = false; // 自動更新をオフに戻す
+            isAutoUpdateActive = false;
             toggleBtn.textContent = 'Start Auto Update';
             toggleBtn.classList.remove('active');
         }
@@ -304,27 +303,24 @@ function toggleAutoUpdate() {
  */
 function handleIntervalChange() {
     if (isAutoUpdateActive) {
-        // 一旦停止して
         if (autoUpdateIntervalId) clearInterval(autoUpdateIntervalId);
         if (countdownIntervalId) clearInterval(countdownIntervalId);
-        // 再開する
         const toggleBtn = document.getElementById('toggle-auto-update-btn');
         toggleBtn.textContent = 'Stop Auto Update';
         toggleBtn.classList.add('active');
-        // stockCodesInput の代わりに myPortfolio からコードを取得
         const codes = myPortfolio.map(item => item.code).join(',');
         if (codes) {
             const intervalSeconds = parseInt(document.getElementById('update-interval').value, 10);
             timeRemaining = intervalSeconds;
-            fetchMainData(codes);
+            fetchMainData(codes, 'portfolio-container'); // ポートフォリオコンテナを更新
             autoUpdateIntervalId = setInterval(() => {
                 timeRemaining = intervalSeconds;
-                fetchMainData(codes);
+                fetchMainData(codes, 'portfolio-container'); // ポートフォリオコンテナを更新
             }, intervalSeconds * 1000);
             countdownIntervalId = setInterval(updateCountdownDisplay, 1000);
         } else {
             alert('ポートフォリオに銘柄が登録されていません。自動更新を再開できません。');
-            isAutoUpdateActive = false; // 自動更新をオフに戻す
+            isAutoUpdateActive = false;
             toggleBtn.textContent = 'Start Auto Update';
             toggleBtn.classList.remove('active');
         }
@@ -353,33 +349,34 @@ function updateCountdownDisplay() {
  * @param {string} codes - 取得する株価・指数コードのカンマ区切り文字列
  * @param {string} target - 出力先のプレフィックス ('' or 'modal-')
  */
-async function fetchMainData(codes) {
-    console.log(`fetchMainData called with codes: ${codes}`);
+async function fetchMainData(codes, targetContainerId = 'stock-container') {
+    console.log(`fetchMainData called with codes: ${codes} for container: ${targetContainerId}`);
     // データ表示用のDOM要素を取得
     const resultsLoadingDiv = document.getElementById(`resultsLoading`);
-    const searchResultsDiv = document.getElementById(`search-results-container`);
+    const targetContainer = document.getElementById(targetContainerId);
     const searchRawDataPre = document.getElementById(`searchRawData`);
-    const searchResultsSection = document.getElementById(`searchResultsSection`);
 
-    if(searchResultsSection) searchResultsSection.style.display = 'block';
+    if (!targetContainer) {
+        console.error(`Target container with ID ${targetContainerId} not found.`);
+        return;
+    }
 
     // 要素が存在するかチェック
-    if (!resultsLoadingDiv || !searchResultsDiv || !searchRawDataPre) {
+    if (!resultsLoadingDiv || !searchRawDataPre) {
         console.error('データ表示用のDOM要素が見つかりません。');
         return;
     }
 
     if (!codes) {
-        searchResultsDiv.innerHTML = '<p>表示する株価・指数コードが指定されていません。</p>';
-        resultsLoadingDiv.style.display = 'none';
-        searchRawDataPre.textContent = '';
+        targetContainer.innerHTML = '<p>表示する株価・指数コードが指定されていません。</p>';
         return;
     }
 
     // ローディング状態にする
     resultsLoadingDiv.style.display = 'block';
-    searchResultsDiv.innerHTML = '';
-    searchRawDataPre.textContent = '';
+    if (targetContainer.innerHTML === '') { // コンテナが空の場合のみクリア
+        targetContainer.innerHTML = '';
+    }
 
     try {
         const urlToFetch = `${WORKER_URL}?codes=${encodeURIComponent(codes)}`;
@@ -395,11 +392,8 @@ async function fetchMainData(codes) {
             console.log(`Fetched items for ${codes}:`, fetchedItems);
 
             if (Array.isArray(fetchedItems) && fetchedItems.length > 0) {
-                const stockContainer = document.getElementById(`stock-container`);
-                console.log(`Target stockContainer:`, stockContainer);
-
                 // コンテナをクリア
-                if(stockContainer) stockContainer.innerHTML = '';
+                targetContainer.innerHTML = '';
 
                 fetchedItems.forEach(item => {
                     let card;
@@ -433,22 +427,20 @@ async function fetchMainData(codes) {
                         <p><strong>更新日時:</strong> ${updateTime}</p>
                         <p><strong>ソース:</strong> ${data.source || 'N/A'}</p>
                     `;
-                    if(stockContainer) {
-                        stockContainer.appendChild(card);
-                        console.log(`Appended stock card to stockContainer:`, card);
-                    }
+                    targetContainer.appendChild(card);
+                    console.log(`Appended stock card to ${targetContainerId}:`, card);
                 });
             } else {
-                searchResultsDiv.innerHTML = '<p>指定されたコードのデータは見つかりませんでした。</p>';
+                targetContainer.innerHTML = '<p>指定されたコードのデータは見つかりませんでした。</p>';
             }
         } else {
-            searchResultsDiv.innerHTML = `<p style="color:red;">APIエラー: ${data.message || response.statusText || '不明なエラー'}</p>`;
+            targetContainer.innerHTML = `<p style="color:red;">APIエラー: ${data.message || response.statusText || '不明なエラー'}</p>`;
         }
 
     } catch (error) {
         console.error('データの取得に失敗しました:', error);
         resultsLoadingDiv.style.display = 'none';
-        searchResultsDiv.innerHTML = `<p style="color:red;">ネットワークエラー: ${error.message}</p>`;
+        targetContainer.innerHTML = `<p style="color:red;">ネットワークエラー: ${error.message}</p>`;
     }
 }
 
@@ -765,23 +757,18 @@ function init() {
         });
     }
 
-    // 初期データ取得とポートフォリオのロード
+    // --- 初期化処理 ---
+
+    // 1. デフォルトで主要指数、指定コード、為替レートを表示
+    fetchMainData('^DJI,998407,USDJPY=FX', 'stock-container');
+
+    // 2. ポートフォリオをロード
     loadPortfolio();
 
-    // loadPortfolio内でモーダル表示のロジックが追加されたため、
-    // ここでの分岐を少しシンプルにします。
-    // ポートフォリオに銘柄があれば、そのコードを検索ボックスに設定して自動検索
+    // 3. ポートフォリオがあれば、ポートフォリオエリアに表示
     if (myPortfolio.length > 0) {
         const portfolioCodes = myPortfolio.map(item => item.code).join(',');
-        fetchMainData(portfolioCodes); // メインページをターゲットにする
-    } else {
-        // ポートフォリオが空の場合、loadPortfolioがモーダルを開くので、
-        // ここでは何もしないか、もしくはプレースホルダーの検索を実行するかを選択できます。
-        // 既存の入力値で検索するロジックは維持しておきます。
-        const initialCodes = stockCodesInput.value.trim();
-        if (initialCodes) {
-            fetchMainData(initialCodes);
-        }
+        fetchMainData(portfolioCodes, 'portfolio-container');
     }
 }
 
