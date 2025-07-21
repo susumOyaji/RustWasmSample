@@ -276,10 +276,10 @@ function toggleAutoUpdate() {
         if (codes) {
             const intervalSeconds = parseInt(document.getElementById('update-interval').value, 10);
             timeRemaining = intervalSeconds;
-            fetchMainData(codes, 'portfolio-container'); // ポートフォリオコンテナを更新
+            fetchMainData(codes, 'portfolio-container', false); // 自動更新時は常に上書き
             autoUpdateIntervalId = setInterval(() => {
                 timeRemaining = intervalSeconds;
-                fetchMainData(codes, 'portfolio-container'); // ポートフォリオコンテナを更新
+                fetchMainData(codes, 'portfolio-container', false); // 自動更新時は常に上書き
             }, intervalSeconds * 1000);
             if (countdownIntervalId) clearInterval(countdownIntervalId);
             countdownIntervalId = setInterval(updateCountdownDisplay, 1000);
@@ -312,10 +312,10 @@ function handleIntervalChange() {
         if (codes) {
             const intervalSeconds = parseInt(document.getElementById('update-interval').value, 10);
             timeRemaining = intervalSeconds;
-            fetchMainData(codes, 'portfolio-container'); // ポートフォリオコンテナを更新
+            fetchMainData(codes, 'portfolio-container', false); // 自動更新時は常に上書き
             autoUpdateIntervalId = setInterval(() => {
                 timeRemaining = intervalSeconds;
-                fetchMainData(codes, 'portfolio-container'); // ポートフォリオコンテナを更新
+                fetchMainData(codes, 'portfolio-container', false); // 自動更新時は常に上書き
             }, intervalSeconds * 1000);
             countdownIntervalId = setInterval(updateCountdownDisplay, 1000);
         } else {
@@ -349,8 +349,8 @@ function updateCountdownDisplay() {
  * @param {string} codes - 取得する株価・指数コードのカンマ区切り文字列
  * @param {string} target - 出力先のプレフィックス ('' or 'modal-')
  */
-async function fetchMainData(codes, targetContainerId = 'stock-container') {
-    console.log(`fetchMainData called with codes: ${codes} for container: ${targetContainerId}`);
+async function fetchMainData(codes, targetContainerId = 'stock-container', appendToRawData = false) {
+    console.log(`fetchMainData called with codes: ${codes} for container: ${targetContainerId}, appendToRawData: ${appendToRawData}`);
     // データ表示用のDOM要素を取得
     const resultsLoadingDiv = document.getElementById(`resultsLoading`);
     const targetContainer = document.getElementById(targetContainerId);
@@ -385,11 +385,21 @@ async function fetchMainData(codes, targetContainerId = 'stock-container') {
         console.log(`API Response for ${codes}:`, data);
 
         resultsLoadingDiv.style.display = 'none'; // ローディング表示を非表示に
-        searchRawDataPre.textContent = JSON.stringify(data, null, 2); // デバッグ用に生データを表示
+        // デバッグ用に生データを表示
+        if (searchRawDataPre) {
+            const rawDataContent = `--- Data for codes: ${codes} (${new Date().toLocaleString()}) ---
+` + JSON.stringify(data, null, 2) + '\n\n';
+            if (appendToRawData) {
+                searchRawDataPre.textContent += rawDataContent;
+            } else {
+                searchRawDataPre.textContent = rawDataContent;
+            }
+        }
 
         if (response.ok && data.status === 'success') {
             const fetchedItems = data.data.data;
             console.log(`Fetched items for ${codes}:`, fetchedItems);
+
 
             if (Array.isArray(fetchedItems) && fetchedItems.length > 0) {
                 // コンテナをクリア
@@ -647,7 +657,7 @@ function init() {
         fetchDataButton.addEventListener('click', () => {
             const codes = stockCodesInput.value.trim();
             if (codes) {
-                fetchMainData(codes);
+                fetchMainData(codes, 'stock-container', false); // 手動検索時は常に上書き
             } else {
                 alert('株価・指数コードを入力してください。');
             }
@@ -672,103 +682,20 @@ function init() {
     cancelPortfolioModalBtn = document.getElementById('cancelPortfolioModalBtn'); // モーダル内のキャンセルボタン
 
 
-    const searchRawDataPre = document.getElementById('searchRawData');
-    if (searchRawDataPre) {
-        searchRawDataPre.textContent = 'ここにAPIからの生データが表示されます。';
-    }
-
-    // イベントリスナー登録
-    
-
-    // 自動更新ボタンのイベントリスナー
-    if (toggleAutoUpdateBtn) {
-        toggleAutoUpdateBtn.addEventListener('click', toggleAutoUpdate);
-    }
-
-    // 更新間隔セレクトボックスのイベントリスナー
-    if (updateIntervalSelect) {
-        updateIntervalSelect.addEventListener('change', handleIntervalChange);
-    }
-
-    // 「銘柄を追加 / 更新」ボタン (モーダル内のボタン)
-    if (addOrUpdatePortfolioBtn && portfolioCodeInput && portfolioSharesInput && portfolioPriceInput) {
-        addOrUpdatePortfolioBtn.addEventListener('click', () => {
-            const code = portfolioCodeInput.value.trim().toUpperCase();
-            const shares = parseInt(portfolioSharesInput.value);
-            const price = parseFloat(portfolioPriceInput.value);
-
-            if (!code || isNaN(shares) || shares <= 0 || isNaN(price) || price <= 0) {
-                alert('企業コード、取得株数、購入単価を正しく入力してください。');
-                return;
-            }
-
-            const editingIndex = addOrUpdatePortfolioBtn.getAttribute('data-editing-index');
-
-            if (editingIndex !== null) { // 編集モード
-                myPortfolio[parseInt(editingIndex)] = { code, shares, purchasePrice: price };
-            } else { // 新規追加モード
-                const existingItemIndex = myPortfolio.findIndex(item => item.code === code);
-                if (existingItemIndex !== -1) {
-                    if (confirm(`${code} は既にポートフォリオに存在します。取得株数と購入単価を更新しますか？`)) {
-                        myPortfolio[existingItemIndex].shares = shares;
-                        myPortfolio[existingItemIndex].purchasePrice = price;
-                    } else {
-                        return;
-                    }
-                } else {
-                    myPortfolio.push({ code, shares, purchasePrice: price, purchaseDate: new Date().toISOString().split('T')[0] });
-                }
-            }
-
-            savePortfolio();
-            // ポートフォリオ更新後、モーダル内の表示を更新する
-            renderPortfolio();
-            // フォームをクリア (モーダルは閉じない。連続操作のため)
-            clearPortfolioForm();
-        });
-    }
-
-    // 「入力クリア」ボタン (モーダル内のボタン)
-    if (clearPortfolioFormBtn) {
-        clearPortfolioFormBtn.addEventListener('click', clearPortfolioForm);
-    }
-
-    // 「ポートフォリオを見る / 編集」ボタン (メインページにある)
-    if (openPortfolioModalBtn) {
-        openPortfolioModalBtn.addEventListener('click', () => openModal(false)); // 新規追加モード (最初は編集フォームをクリアするため)
-    }
-
-    // モーダルの閉じるボタン
-    if (closeButton) {
-        closeButton.addEventListener('click', closeModal);
-    }
-
-    // モーダルのキャンセルボタン
-    if (cancelPortfolioModalBtn) {
-        cancelPortfolioModalBtn.addEventListener('click', closeModal);
-    }
-
-    // モーダル外クリックで閉じる
-    if (portfolioModal) {
-        window.addEventListener('click', (event) => {
-            if (event.target === portfolioModal) {
-                closeModal();
-            }
-        });
-    }
-
     // --- 初期化処理 ---
 
     // 1. デフォルトで主要指数、指定コード、為替レートを表示
-    fetchMainData('^DJI,998407,USDJPY=FX', 'stock-container');
+    fetchMainData('^DJI,998407,USDJPY=FX', 'stock-container', false);
 
     // 2. ポートフォリオをロード
     loadPortfolio();
+    console.log('myPortfolio after loadPortfolio:', myPortfolio); // ★この行を追加
 
     // 3. ポートフォリオがあれば、ポートフォリオエリアに表示
     if (myPortfolio.length > 0) {
         const portfolioCodes = myPortfolio.map(item => item.code).join(',');
-        fetchMainData(portfolioCodes, 'portfolio-container');
+        console.log('Fetching portfolio data for codes:', portfolioCodes); // ★この行を追加
+        fetchMainData(portfolioCodes, 'portfolio-container', true);
     }
 }
 
