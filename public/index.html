@@ -13,15 +13,56 @@
         <input type="text" id="code-input" placeholder="6758" required>
         <button type="submit">取得</button>
     </form>
-    <h3>結果:</h3>
-    <div id="card-container"></div>
 
-    <h3>最後に検索した結果:</h3> <!-- 新しい見出し -->
-    <div id="last-searched-card-container"></div> <!-- 新しい表示エリア -->
+    <div id="auto-update-controls">
+        <label>
+            <input type="checkbox" id="auto-update-checkbox">
+            自動更新を有効にする (60秒ごと)
+        </label>
+        <span id="update-countdown"></span>
+    </div>
+    <h3>結果:</h3>
+    <div id="card-container" class="card-container"></div>
+
+    <h3>保有株の現在値:</h3> <!-- 見出しを変更 -->
+    <div id="last-searched-card-container" class="card-container"></div> <!-- このエリアは保有株表示用になる -->
 
     <h3>生データ:</h3>
     <div id="raw-data-container"><pre id="raw-data-display"></pre></div>
 
+    <hr>
+    <h2>保有株管理</h2>
+    <form id="portfolio-form">
+        <input type="hidden" id="portfolio-id"> <!-- 編集時に使用 -->
+        <input type="text" id="portfolio-code" placeholder="企業コード" required>
+        <input type="number" id="portfolio-shares" placeholder="取得株数" required>
+        <input type="number" id="portfolio-price" placeholder="取得単価" step="any" required>
+        <button type="submit">保存</button>
+    </form>
+
+    <h3>保有株一覧</h3>
+    <table id="portfolio-table">
+        <thead>
+            <tr>
+                <th>企業コード</th>
+                <th>取得株数</th>
+                <th>取得単価</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- JavaScriptでデータを挿入 -->
+        </tbody>
+    </table>
+
     <script src="main.js"></script>
+
+    <!-- ポップアップウィンドウの構造 -->
+    <div id="popup-overlay" class="hidden"></div>
+    <div id="popup-modal" class="hidden">
+        <button id="popup-close-btn">&times;</button>
+        <h3>詳細データ</h3>
+        <div id="popup-content"></div>
+    </div>
 </body>
 </html>
