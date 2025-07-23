@@ -24,11 +24,15 @@
     <h3>結果:</h3>
     <div id="card-container" class="card-container"></div>
 
+    <h3>総合損益:</h3>
+    <div id="total-profit-loss">
+        <p id="totalPurchaseCostDisplay">Total investment amount: 計算中...</p>
+        <p id="totalMarketValueDisplay">Total market value: 計算中...</p>
+        <p id="totalUnrealizedProfitLossDisplay">Total unrealized profit/loss: 計算中...</p>
+    </div>
+
     <h3>保有株の現在値:</h3> <!-- 見出しを変更 -->
     <div id="last-searched-card-container" class="card-container"></div> <!-- このエリアは保有株表示用になる -->
-
-    <h3>生データ:</h3>
-    <div id="raw-data-container"><pre id="raw-data-display"></pre></div>
 
     <hr>
     <h2>保有株管理</h2>
@@ -54,6 +58,9 @@
             <!-- JavaScriptでデータを挿入 -->
         </tbody>
     </table>
+
+    <h3>生データ:</h3>
+    <div id="raw-data-container"><pre id="raw-data-display"></pre></div>
 
     <script src="main.js"></script>
 

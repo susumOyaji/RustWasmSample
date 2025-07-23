@@ -24,6 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const portfolioSharesInput = document.getElementById('portfolio-shares');
     const portfolioPriceInput = document.getElementById('portfolio-price');
 
+    // 総合損益エリアの要素
+    const portfolioTotalPurchaseCostElement = document.getElementById('totalPurchaseCostDisplay');
+    const totalMarketValueDisplayElement = document.getElementById('totalMarketValueDisplay');
+    const portfolioTotalValueElement = document.getElementById('portfolioTotalValue');
+    const portfolioTotalProfitElement = document.getElementById('portfolioTotalProfit');
+    const totalUnrealizedProfitLossDisplayElement = document.getElementById('totalUnrealizedProfitLossDisplay');
+
     let portfolio = JSON.parse(localStorage.getItem('portfolio')) || [];
 
     let updateIntervalId; // setIntervalのIDを保持
@@ -80,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p><strong>Code: ${item.code || 'Code not found'}</strong></p>
                 <p><strong>Name:</strong> ${item.name}</p>
                 <p><strong>Bid値:</strong> ${item.bid_value || 'N/A'}</p>
-                <p><strong>更新日時:</strong> ${item.update_time || 'N/A'}</p>
+                <p><strong>Update Time:</strong> ${item.update_time || 'N/A'}</p>
             `;
         } else {
             const code = item.code || 'Code time not found';
@@ -92,9 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
             cardContent = `
                 <p><strong>Code: ${code}</strong></p>
                 <p><strong>Name:</strong> ${name}</p>
-                <p><strong>現在値:</strong> ${value}</p>
-                <p><strong>前日比:</strong> ${change}</p>
-                <p><strong>更新日時:</strong> ${updateTime}</p>
+                <p><strong>Price:</strong> ${value}</p>
+                <p><strong>Ratin:</strong> ${change}</p>
+                <p><strong>Update Time:</strong> ${updateTime}</p>
             `;
         }
 
@@ -106,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // すべてのデータを取得し、振り分けて表示するメイン関数
     async function fetchAllData() {
-        const defaultCodes = ['USDJPY=FX', '^DJI', '998407'];
+        const defaultCodes = ['^DJI', '998407','USDJPY=FX'];
         // portfolio変数はDOMContentLoadedのスコープで定義されているため、直接アクセス可能
         const portfolioCodes = portfolio.map(stock => stock.code);
 
@@ -159,14 +166,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 // 保有株一覧を表示（重複を許容）
+                let totalMarketValue = 0;
                 portfolio.forEach(stock => {
                     const item = fetchedDataMap.get(stock.code);
                     if (item) {
                         // 保有株情報（取得株数、単価）をAPIからのデータにマージしてポップアップに表示
                         const displayItem = { ...item, ...stock };
                         createAndAppendCard(displayItem, lastSearchedCardContainer);
+                        // 時価総額を計算
+                        const currentValue = parseFloat(String(item.current_value || item.bid_value).replace(/,/g, ''));
+                        if (!isNaN(currentValue)) {
+                            totalMarketValue += currentValue * parseFloat(stock.shares);
+                        }
                     }
                 });
+                totalMarketValueDisplayElement.textContent = `Total market value: ${totalMarketValue.toLocaleString()} 円`;
+
+                // 合計評価損益を計算
+                const totalPurchaseCost = portfolio.reduce((sum, stock) => sum + parseFloat(stock.shares) * parseFloat(stock.price), 0);
+                const totalUnrealizedProfitLoss = totalMarketValue - totalPurchaseCost;
+                totalUnrealizedProfitLossDisplayElement.textContent = `Total unrealized profit/loss: ${totalUnrealizedProfitLoss.toLocaleString()} 円`;
+                totalUnrealizedProfitLossDisplayElement.classList.remove('profit', 'loss', 'zero-change');
+                if (totalUnrealizedProfitLoss > 0) {
+                    totalUnrealizedProfitLossDisplayElement.classList.add('profit');
+                } else if (totalUnrealizedProfitLoss < 0) {
+                    totalUnrealizedProfitLossDisplayElement.classList.add('loss');
+                } else {
+                    totalUnrealizedProfitLossDisplayElement.classList.add('zero-change');
+                }
 
             } else {
                 cardContainer.textContent = `APIエラー: ${result.message}`;
@@ -241,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 保有株データをテーブルにレンダリングする関数
     function renderPortfolio() {
         portfolioTableBody.innerHTML = '';
+        let totalPurchaseCost = 0;
         portfolio.forEach(stock => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -253,7 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
             `;
             portfolioTableBody.appendChild(row);
+            totalPurchaseCost += parseFloat(stock.shares) * parseFloat(stock.price);
         });
+        portfolioTotalPurchaseCostElement.textContent = `Total investment amount: ${totalPurchaseCost.toLocaleString()} 円`;
     }
 
     // フォーム送信時の処理

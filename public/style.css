@@ -43,6 +43,48 @@ button:hover {
     gap: 15px;
 }
 
+#total-profit-loss {
+    margin-top: 25px; /* 少しスペースを増やす */
+    padding: 25px; /* パディングを増やす */
+    border: none; /* 既存のボーダーを削除 */
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%); /* 爽やかなグラデーション */
+    border-radius: 12px; /* 角を丸くする */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* より強い影 */
+    font-size: 1.3em; /* フォントサイズを少し大きく */
+    font-weight: 600; /* フォントウェイトを調整 */
+    text-align: center;
+    display: flex; /* Flexboxを有効にする */
+    flex-direction: column; /* 縦方向に並べる */
+    gap: 10px; /* 要素間のスペース */
+    color: #263238; /* テキストカラーを濃いめに */
+}
+
+#total-profit-loss p {
+    margin: 0; /* pタグのデフォルトマージンをリセット */
+    padding: 5px 0; /* 上下のパディング */
+    border-bottom: 1px solid rgba(0,0,0,0.05); /* 区切り線 */
+}
+
+#total-profit-loss p:last-child {
+    border-bottom: none; /* 最後の要素の区切り線を削除 */
+}
+
+/* 損益の表示色を調整 */
+.profit {
+    color: #e53935; /* より鮮やかな赤 */
+    font-weight: 700;
+}
+
+.loss {
+    color: #28a745; /* 緑色 */
+    font-weight: 700;
+}
+
+.zero-change {
+    color: #424242; /* 濃いグレー */
+    font-weight: 700;
+}
+
 /* カードコンテナのスタイル */
 .card-container {
     display: flex; /* カードを横並びにする */
