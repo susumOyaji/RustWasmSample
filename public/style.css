@@ -83,6 +83,10 @@ button:hover {
     color: #007bff;
 }
 
+.financial-card .card-details p {
+    margin: 0; /* 行間を狭くする */
+}
+
 .financial-card pre {
     background-color: #eef;
     padding: 10px;

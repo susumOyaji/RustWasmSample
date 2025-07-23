@@ -66,10 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         itemDiv.addEventListener('click', () => openPopup(item));
 
-        const code = item.code || 'Code not found';
-        const heading = document.createElement('h4');
-        heading.textContent = item.name || `Code: ${code}`;
-        itemDiv.appendChild(heading);
+        //const code = item.code || 'Code not found';
+        //const heading = document.createElement('h4');
+        //heading.textContent = item.name || `Code: ${code}`;
+        //itemDiv.appendChild(heading);
 
         const detailsDiv = document.createElement('div');
         detailsDiv.classList.add('card-details');
@@ -77,15 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
         let cardContent = '';
         if (item.name === '米ドル/円') {
             cardContent = `
+                <p><strong>Code: ${item.code || 'Code not found'}</strong></p>
+                <p><strong>Name:</strong> ${item.name}</p>
                 <p><strong>Bid値:</strong> ${item.bid_value || 'N/A'}</p>
                 <p><strong>更新日時:</strong> ${item.update_time || 'N/A'}</p>
             `;
         } else {
+            const code = item.code || 'Code time not found';
+            const name = item.name || 'Name not found';
             const value = item.current_value || item.bid_value || 'N/A';
             const change = item.previous_day_change ? `${item.previous_day_change} (${item.change_rate}%)` : 'N/A';
             const updateTime = item.update_time || 'Update time not found';
 
             cardContent = `
+                <p><strong>Code: ${code}</strong></p>
+                <p><strong>Name:</strong> ${name}</p>
                 <p><strong>現在値:</strong> ${value}</p>
                 <p><strong>前日比:</strong> ${change}</p>
                 <p><strong>更新日時:</strong> ${updateTime}</p>
